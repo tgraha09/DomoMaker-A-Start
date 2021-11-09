@@ -33,7 +33,7 @@ let redisURL = {
 let redisPASS = 'igme430db';
 if (process.env.REDISCLOUD_URL) {
   redisURL = url.parse(process.env.REDISCLOUD_URL);
-  [, redisPASS] = redis.auth.split(':');
+  [, redisPASS] = redisURL.auth.split(':');
 }
 const redisClient = redis.createClient({
   host: redisURL.hostname,
