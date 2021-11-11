@@ -98,29 +98,20 @@ const createSignupWindow = (csrf) =>{
 const setup = (csrf) =>{
     const loginButton = document.querySelector("#loginButton");
     const signupButton = document.querySelector("#signupButton")
-   // console.log(csrf);
-    //createSignupWindow(csrf);
-    //createLoginWindow(csrf);
-    if(location.pathname === '/'){
-        //console.log(location.pathname)
-        loginButton.addEventListener("click", (e)=>{
-            e.preventDefault();
-            createLoginWindow(csrf);
-            return false;
-        });
-    
-        signupButton.addEventListener("click", (e) => {
-            e.preventDefault();
-            createSignupWindow(csrf);
-            return false;
-        });
-        createLoginWindow(csrf); //default view
-    }
-    
+   //console.log(location.pathname)
+    loginButton.addEventListener("click", (e)=>{
+        e.preventDefault();
+        createLoginWindow(csrf);
+        return false;
+    });
 
-    
-
-    
+    signupButton.addEventListener("click", (e) => {
+        e.preventDefault();
+        createSignupWindow(csrf);
+        return false;
+    });
+    createLoginWindow(csrf); //default view
+ 
 };
 
 const getToken = () => {

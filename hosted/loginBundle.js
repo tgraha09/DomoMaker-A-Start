@@ -129,24 +129,19 @@ var createSignupWindow = function createSignupWindow(csrf) {
 
 var setup = function setup(csrf) {
   var loginButton = document.querySelector("#loginButton");
-  var signupButton = document.querySelector("#signupButton"); // console.log(csrf);
-  //createSignupWindow(csrf);
-  //createLoginWindow(csrf);
+  var signupButton = document.querySelector("#signupButton"); //console.log(location.pathname)
 
-  if (location.pathname === '/') {
-    //console.log(location.pathname)
-    loginButton.addEventListener("click", function (e) {
-      e.preventDefault();
-      createLoginWindow(csrf);
-      return false;
-    });
-    signupButton.addEventListener("click", function (e) {
-      e.preventDefault();
-      createSignupWindow(csrf);
-      return false;
-    });
-    createLoginWindow(csrf); //default view
-  }
+  loginButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    createLoginWindow(csrf);
+    return false;
+  });
+  signupButton.addEventListener("click", function (e) {
+    e.preventDefault();
+    createSignupWindow(csrf);
+    return false;
+  });
+  createLoginWindow(csrf); //default view
 };
 
 var getToken = function getToken() {
