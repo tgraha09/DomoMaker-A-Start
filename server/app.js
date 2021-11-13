@@ -15,8 +15,8 @@ const csrf = require('csurf');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const dbURL = process.env.MONGODB_URI
-|| 'mongodb+srv://tfire09:Facetime217!@cluster0.qga9p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
-|| 'mongodb://localhost/DomoMaker';
+|| 'mongodb+srv://tfire09:Facetime217!@cluster0.qga9p.mongodb.net/myFirstDatabaseE?retryWrites=true&w=majority'
+|| 'mongodb://localhost/DomoMakerE';
 
 mongoose.connect(dbURL, (err) => {
   if (err) {
@@ -35,6 +35,7 @@ if (process.env.REDISCLOUD_URL) {
   redisURL = url.parse(process.env.REDISCLOUD_URL);
   [, redisPASS] = redisURL.auth.split(':');
 }
+
 const redisClient = redis.createClient({
   host: redisURL.hostname,
   port: redisURL.port,
@@ -84,5 +85,5 @@ app.listen(port, (err) => {
   if (err) {
     throw err;
   }
-  console.log(`Listening on port ${port}`); 
+  console.log(`Listening on port ${port}`);
 });

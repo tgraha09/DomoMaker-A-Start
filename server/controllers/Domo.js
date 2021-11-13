@@ -14,18 +14,21 @@ const makerPage = (req, res) => {
 };
 
 const makeDomo = (req, res) => {
-  if (!req.body.name || !req.body.age) {
-    return res.status(400).json({ error: 'RAWR! Both name and age are requried' });
+  if (!req.body.name || !req.body.age || !req.body.height) {
+    return res.status(400).json({ error: 'RAWR! Both name, age and height are requried' });
   }
 
   const domoData = {
     name: req.body.name,
     age: req.body.age,
+    height: req.body.height,
     owner: req.session.account._id,
   };
 
-  const newDomo = new Domo.DomoModel(domoData);
+  console.log(domoData);
 
+  const newDomo = new Domo.DomoModel(domoData);
+  console.log(newDomo);
   const domoPromise = newDomo.save();
 
   domoPromise.then(() => res.json({ redirect: '/maker' }));
@@ -47,7 +50,7 @@ const getDomos = (req, res) => {
       console.log(err);
       return res.status(400).json({ error: 'An error occurred' });
     }
-
+    // console.log(docs)
     return res.json({ domos: docs });
   });
 };
