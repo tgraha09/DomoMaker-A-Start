@@ -22,7 +22,7 @@ const DomoForm = (props) => {
         <form id="domoForm" 
         onSubmit={handleDomo} 
         name="domoForm"
-        action="/maker" 
+        action="/finder" 
         method="POST" 
         className="domoForm">
 
@@ -99,8 +99,8 @@ const getToken = () => {
     });
 };
 
-$(document).ready(function() {
+/*$(document).ready(function() {
     //console.log("Maker Init")
     //setup()
     getToken();
-});
+});*/
