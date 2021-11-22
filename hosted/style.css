@@ -37,8 +37,16 @@
 }
 .content{
     position: relative;
-    display: block;
+    display: flex;
     height: inherit;
+    
+    
+  }
+
+  .content-wrap{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
   }
 
   .link{
@@ -51,6 +59,7 @@
     width: inherit;
     flex-direction: column;
     justify-content: center;
+  
   }
   
   .linkWrap{

@@ -150,7 +150,9 @@ var Finder = /*#__PURE__*/function (_React$Component) {
     value: function render() {
       var _this2 = this;
 
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "content-wrap"
+      }, /*#__PURE__*/React.createElement("h1", {
         className: "title"
       }, "Recipe Finder"), /*#__PURE__*/React.createElement("nav", {
         className: "nav"
@@ -291,7 +293,9 @@ var Search = /*#__PURE__*/function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "content-wrap"
+      }, /*#__PURE__*/React.createElement("h1", {
         className: "title"
       }, "Search Results"), /*#__PURE__*/React.createElement("nav", {
         className: "nav"

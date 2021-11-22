@@ -80,8 +80,8 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
       var path = document.querySelector("#loginForm").getAttribute("action");
       var query = this.createQuery(); //const completionCallback = redirect("/finder");
 
-      console.log(query);
-      console.log("LoginCLIENT");
+      console.log(query); //console.log("LoginCLIENT");
+
       sendAjax(method, path, query, function () {
         window.location = "/finder";
       });
@@ -90,7 +90,9 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "content-wrap"
+      }, /*#__PURE__*/React.createElement("h1", {
         className: "title"
       }, "Recipe Finder"), /*#__PURE__*/React.createElement("nav", {
         className: "nav"
@@ -108,7 +110,7 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
         href: "/signup"
       }, "Signup"))), /*#__PURE__*/React.createElement("h3", {
         className: "desc"
-      }, "Search a recipe by its food and cuisine tag."), /*#__PURE__*/React.createElement("div", {
+      }, "Login"), /*#__PURE__*/React.createElement("div", {
         className: "content"
       }, /*#__PURE__*/React.createElement("form", {
         id: "loginForm",
@@ -230,7 +232,9 @@ var SignupWindow = /*#__PURE__*/function (_React$Component2) {
   }, {
     key: "render",
     value: function render() {
-      return /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "content-wrap"
+      }, /*#__PURE__*/React.createElement("h1", {
         className: "title"
       }, "Recipe Finder"), /*#__PURE__*/React.createElement("nav", {
         className: "nav"
@@ -248,7 +252,7 @@ var SignupWindow = /*#__PURE__*/function (_React$Component2) {
         href: "/signup"
       }, "Signup"))), /*#__PURE__*/React.createElement("h3", {
         className: "desc"
-      }, "Search a recipe by its food and cuisine tag."), /*#__PURE__*/React.createElement("div", {
+      }, "Signup"), /*#__PURE__*/React.createElement("div", {
         id: "content"
       }, /*#__PURE__*/React.createElement("form", {
         id: "signupForm",

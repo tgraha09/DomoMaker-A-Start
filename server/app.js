@@ -67,7 +67,7 @@ app.use(bodyParser.urlencoded({
   }) */
 app.use(session({
   key: 'sessionid',
-  secret: 'Domo Arigato',
+  secret: 'Recipe Finder',
   resave: true,
   saveUninitialized: true,
   cookie: {

@@ -117,7 +117,7 @@ class Finder extends React.Component{
       }
   
     render(){
-      return (<div>
+      return (<div className="content-wrap">
     <h1 className="title">Recipe Finder</h1>
     <nav className="nav">  
         <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>
@@ -207,7 +207,7 @@ class Search extends React.Component{
     }
   
     render(){
-      return (<div>
+      return (<div className="content-wrap">
     <h1 className="title">Search Results</h1>
     <nav className="nav">  
         <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>

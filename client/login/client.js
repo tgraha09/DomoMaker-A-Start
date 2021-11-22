@@ -40,7 +40,7 @@
       const query = this.createQuery();
      //const completionCallback = redirect("/finder");
       console.log(query)
-      console.log("LoginCLIENT");
+      //console.log("LoginCLIENT");
       sendAjax(method,path,query,()=>{
         window.location = "/finder"
       });
@@ -49,7 +49,7 @@
     };
   
     render() {
-      return (<div>
+      return (<div className="content-wrap">
       <h1 className="title">Recipe Finder</h1>
         <nav className="nav">
         
@@ -58,7 +58,7 @@
    
     </nav>
     <h3 className="desc">
-      Search a recipe by its food and cuisine tag.
+      Login
     </h3>
       <div className="content">
         
@@ -147,7 +147,7 @@ const Display = ({ ...props }) => {
   
     render(){
       return (
-        <div>
+        <div className="content-wrap">
             <h1 className="title">Recipe Finder</h1>
         <nav className="nav">
         
@@ -156,7 +156,7 @@ const Display = ({ ...props }) => {
    
     </nav>
     <h3 className="desc">
-      Search a recipe by its food and cuisine tag.
+      Signup
     </h3>
         <div id="content">
         <form id="signupForm"

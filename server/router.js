@@ -15,7 +15,7 @@ const router = (app) => {
   app.get('/logout', mid.requiresLogin, controllers.Account.logout);
   app.get('/signup', mid.requiresSecure, mid.requiresLogout, (req, res) => {
     // console.log(req);
-    res.render('login');
+    res.render('signup');
   });
   app.get('/finder', mid.requiresLogin, (req, res) => {
     // console.log(req);
