@@ -4,6 +4,7 @@ const mid = require('./middleware');
 
 const router = (app) => {
   app.get('/recipes-json', controllers.recipes.GETSearchedRecipes);
+  app.get('/recipe-playlist', controllers.recipes.GETPlaylistJSON);
   app.get('/', mid.requiresSecure, mid.requiresLogout, (req, res) => {
     res.render('login');
     // res.sendFile(path.join(__dirname + '/../dist/index.html'));
@@ -22,13 +23,18 @@ const router = (app) => {
     res.render('app');
   }); // mid.requiresLogin,
   app.get('/recipes', mid.requiresLogin, (req, res) => {
-    console.log('/recipes');
+    // console.log('/recipes');
+    res.render('app');
+  });
+  app.get('/recipe', mid.requiresLogin, (req, res) => {
+    // console.log('/recipe');
     res.render('app');
   });
 
   app.post('/login', mid.requiresSecure, mid.requiresLogout, controllers.Account.login); // mid.requiresSecure, mid.requiresLogout,
   app.post('/signup', mid.requiresSecure, mid.requiresLogout, controllers.Account.signup); // mid.requiresSecure, mid.requiresLogout,
-  app.post('/recipes-json', controllers.recipes.POSTSearchedRecipes);
+  app.post('/recipes-json', mid.requiresLogin, controllers.recipes.POSTSearchedRecipes);
+  app.post('/recipe-playlist', mid.requiresLogin, controllers.recipes.POSTRecipeToPlaylist);
   /*
   app.get('/getToken', mid.requiresSecure, controllers.Account.getToken);
   app.get('/getDomos', mid.requiresLogin, controllers.Domo.getDomos);

@@ -50,7 +50,7 @@ var Finder = /*#__PURE__*/function (_React$Component) {
 
     _defineProperty(_assertThisInitialized(_this), "search", function (e) {
       //console.log("FORM BUTTON");
-      var recipeTagInput = $('.tagInput'); //document.body.querySelector('.tagInput')
+      var recipeTagInput = $('#tagInput'); //document.body.querySelector('.tagInput')
 
       var searchFood = $('#food'); // document.body.querySelector('#food')
 
@@ -89,6 +89,8 @@ var Finder = /*#__PURE__*/function (_React$Component) {
     value: function init() {
       //form="searchform"
       //sessionStorage.setItem('results', null)
+      sessionStorage.removeItem("food");
+      sessionStorage.removeItem("tag");
       sessionStorage.removeItem('results');
 
       if (sessionStorage.getItem("tagsList") === null || sessionStorage.getItem("tagsList") === "") {
@@ -129,8 +131,9 @@ var Finder = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "getTags",
     value: function getTags() {
-      //sessionStorage.clear()
-      //localStorage.setItem("results", "")
+      //sessionStorage.clear("food")
+      //sessionStorage.setItem("food", "")
+      //sessionStorage.setItem("tag", "")
       var data = null;
       var xhr = new XMLHttpRequest(); //xhr.withCredentials = true;
 
@@ -167,8 +170,8 @@ var Finder = /*#__PURE__*/function (_React$Component) {
       }, /*#__PURE__*/React.createElement("a", {
         className: "link",
         id: "logout",
-        href: "#"
-      }, "Recipe Client"))), /*#__PURE__*/React.createElement("h3", {
+        href: "/recipes"
+      }, "Search Results"))), /*#__PURE__*/React.createElement("h3", {
         className: "desc"
       }, "Search a recipe by its food and cuisine tag."), /*#__PURE__*/React.createElement("div", {
         className: "content"
@@ -188,7 +191,7 @@ var Finder = /*#__PURE__*/function (_React$Component) {
         type: "text",
         id: "food",
         name: "food",
-        defaultValue: "Chicken"
+        defaultValue: "Beef"
       }), /*#__PURE__*/React.createElement("br", null)), /*#__PURE__*/React.createElement("div", {
         id: "tagWrap"
       }, /*#__PURE__*/React.createElement("label", {
@@ -222,6 +225,8 @@ var Finder = /*#__PURE__*/function (_React$Component) {
   return Finder;
 }(React.Component);
 
+var recipeName;
+
 var Search = /*#__PURE__*/function (_React$Component2) {
   _inherits(Search, _React$Component2);
 
@@ -235,9 +240,8 @@ var Search = /*#__PURE__*/function (_React$Component2) {
     _this3 = _super2.call(this, props);
 
     _defineProperty(_assertThisInitialized(_this3), "handleResponse", function (e, food, tag) {
-      console.log(e.target.response);
-      var userSearch = JSON.parse(e.target.response);
-      console.log(userSearch);
+      //console.log(e.target.response);
+      var userSearch = JSON.parse(e.target.response); //console.log(userSearch)
 
       if (userSearch == undefined) {//console.log("UNDEFINED");
       }
@@ -310,8 +314,14 @@ var Search = /*#__PURE__*/function (_React$Component2) {
       }, /*#__PURE__*/React.createElement("a", {
         className: "link",
         id: "logout",
-        href: "#"
-      }, "Recipe Client"))), /*#__PURE__*/React.createElement("h3", {
+        href: "/finder"
+      }, "Finder")), /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "/recipes"
+      }, "Search Results"))), /*#__PURE__*/React.createElement("h3", {
         className: "desc"
       }, "Results"), /*#__PURE__*/React.createElement("div", {
         className: "content"
@@ -322,7 +332,8 @@ var Search = /*#__PURE__*/function (_React$Component2) {
   }, {
     key: "displayRecipies",
     value: function displayRecipies(dataString) {
-      var _data$results;
+      var _data$results,
+          _this6 = this;
 
       console.log("Parsing Recipies");
       var content = document.querySelector('#content');
@@ -339,10 +350,23 @@ var Search = /*#__PURE__*/function (_React$Component2) {
         } // sessionStorage.setItem("recipe", JSON.stringify(recipe))
 
 
-        recipeElement.innerHTML = "<img id=\"thumb\" src=".concat(recipe.thumbnail, "> </img>\n          <a href=\"javascript:void(0)\" recipe=\"").concat(recipe.id, "\" onclick=\"loadRecipe(this)\">").concat(recipe.name, "</a>"); //let element = recipeElement.outerHTML
+        var link = document.createElement('a');
+        var params = new URL(document.location).searchParams;
+        var recipePath = "/recipe?food=".concat(params.get("food"), "&tag=").concat(params.get("tag"), "&id=").concat(recipe.id);
+        link.href = recipePath;
+        link.recipe = recipe.id;
+        link.textContent = recipe.name;
+        recipeElement.innerHTML = "<img id=\"thumb\" src=".concat(recipe.thumbnail, "> </img>") + link.outerHTML; //<a href="javascript:void(0)" recipe="${recipe.id}" onclick=${loadRecipe(recipe.id)}>${recipe.name}</a>
+        //let element = recipeElement.outerHTML
         //console.log(recipeElement);
         // console.log(content);
 
+        link.addEventListener('click', function (e) {
+          e.preventDefault();
+          console.log("click");
+
+          _this6.loadRecipe(e.target);
+        });
         content.append(recipeElement);
         u++;
       }); //sessionStorage.setItem("results", "")
@@ -352,10 +376,389 @@ var Search = /*#__PURE__*/function (_React$Component2) {
   return Search;
 }(React.Component);
 
+var Recipe = /*#__PURE__*/function (_React$Component3) {
+  _inherits(Recipe, _React$Component3);
+
+  var _super3 = _createSuper(Recipe);
+
+  function Recipe(props) {
+    var _this7;
+
+    _classCallCheck(this, Recipe);
+
+    _this7 = _super3.call(this, props);
+
+    _defineProperty(_assertThisInitialized(_this7), "instructions", function (instructObj) {
+      var orderedList = document.createElement("ol");
+      orderedList.id = "instructions";
+      instructObj.forEach(function (obj) {
+        orderedList.innerHTML += "<li>".concat(obj.display_text, "</li>"); //////console.log(obj.display_text);
+      });
+      return orderedList.outerHTML;
+    });
+
+    _defineProperty(_assertThisInitialized(_this7), "saveRecipe", function (e) {
+      console.log("saveRecipe"); // console.log(e);
+
+      var params = new URL(document.location).searchParams;
+      var food = params.get("food") || sessionStorage.getItem("food");
+      console.log(food);
+      var tag = params.get("tag") || sessionStorage.getItem("tag");
+      var id = params.get("id");
+      var name = document.body.querySelector('#name').textContent;
+      name = name.replace('&', "and");
+      var thumbnail = document.body.querySelector('#recipeImg').src; ////console.log(thumbnail)
+
+      var urlPath = "/recipe-playlist?food=".concat(food, "&tag=").concat(tag, "&id=").concat(id, "&name=").concat(name, "&thumbnail=").concat(thumbnail);
+      console.log(urlPath);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", urlPath); //////console.log(xhr.HEADERS_RECEIVED)
+
+      xhr.send();
+      return true;
+    });
+
+    _defineProperty(_assertThisInitialized(_this7), "getRecipe", function () {
+      // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
+      // the `target` property of that event points at the element that sent the event, in this case a button
+      //////console.log(`An element of id=${e.target.id} was clicked!`);
+      var params = new URL(document.location).searchParams;
+      var food = params.get("food"); // || sessionStorage.getItem("food")
+
+      var tag = params.get("tag"); //|| sessionStorage.getItem("tag")
+
+      var id = params.get("id");
+      console.log(food);
+      var data = null;
+      var xhr = new XMLHttpRequest();
+
+      var self = _assertThisInitialized(_this7);
+
+      xhr.withCredentials = false;
+      xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === this.DONE) {
+          //sessionStorage.setItem("recipe", this.responseText)
+          var json = JSON.parse(this.responseText); //////console.log(json);
+
+          var recipe = {
+            name: json.name,
+            description: json.description || "",
+            country: json.country,
+            language: json.language,
+            prepTimeMinutes: json.prep_time_minutes,
+            cookTimeMinutes: json.cook_time_minutes,
+            totalTimeMinutes: json.total_time_minutes,
+            timeTier: json.total_time_tier,
+            num_servings: json.num_servings,
+            video: json.original_video_url,
+            instructions: json.instructions,
+            nutrition: json.nutrition,
+            tags: json.tags,
+            feed: json.recirc_feeds,
+            credits: json.credits,
+            thumbnail: json.thumbnail_url,
+            topics: json.topics,
+            rating: json.user_ratings
+          }; ////console.log(recipe);
+
+          var displayImg = document.body.querySelector("#recipeImg");
+          displayImg.src = recipe.thumbnail;
+          document.querySelector('#name').textContent = recipe.name;
+          var details = document.querySelector("#details");
+          details.innerHTML = "\n        <p>".concat(recipe.description, "</p>\n        <h2>Instructions:</h2>\n        ").concat(self.instructions(recipe.instructions)); //////console.log(this.responseText);
+        }
+      });
+      console.log(id);
+      xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/detail?id=" + id);
+      xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
+      xhr.setRequestHeader("x-rapidapi-key", "63f6ab95cemshe9b57c799d2aff1p19c240jsn4a5093e49c83");
+      xhr.send(data);
+    });
+
+    console.log("Recipe");
+
+    _this7.init();
+
+    return _this7;
+  }
+
+  _createClass(Recipe, [{
+    key: "init",
+    value: function init() {
+      this.getRecipe();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "content-wrap"
+      }, /*#__PURE__*/React.createElement("h1", {
+        className: "title"
+      }, "Search Results"), /*#__PURE__*/React.createElement("nav", {
+        className: "nav"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "/logout"
+      }, "Logout")), /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "/finder"
+      }, "Finder"))), /*#__PURE__*/React.createElement("h2", {
+        id: "name"
+      }, "TITLE"), /*#__PURE__*/React.createElement("p", {
+        id: "p"
+      }, "Hit the \"Save Recipe\" button to store a recipe in your list"), /*#__PURE__*/React.createElement("button", {
+        id: "save",
+        onClick: this.saveRecipe
+      }, "Save Recipe"), /*#__PURE__*/React.createElement("div", {
+        className: "content"
+      }, /*#__PURE__*/React.createElement("div", {
+        id: "content"
+      }, /*#__PURE__*/React.createElement("div", {
+        id: "sel"
+      }, /*#__PURE__*/React.createElement("div", {
+        id: "selected"
+      }, /*#__PURE__*/React.createElement("img", {
+        id: "recipeImg",
+        src: "#",
+        alt: ""
+      }), /*#__PURE__*/React.createElement("div", {
+        id: "details"
+      }))))));
+    }
+  }, {
+    key: "displayRecipies",
+    value: function displayRecipies(dataString) {
+      var _data$results2;
+
+      console.log("Parsing Recipies");
+      var content = document.querySelector('#content');
+      var data = dataString.result; ////console.log(dataString.results);
+      //console.log(document.body);
+
+      var u = 0; //sessionStorage.setItem("results", "")
+
+      data === null || data === void 0 ? void 0 : (_data$results2 = data.results) === null || _data$results2 === void 0 ? void 0 : _data$results2.forEach(function (recipe) {
+        //console.log(recipe);
+        var recipeElement = document.createElement('recipe');
+
+        if (u == 0) {////console.log(params);
+        } // sessionStorage.setItem("recipe", JSON.stringify(recipe))
+
+
+        recipeElement.innerHTML = "<img id=\"thumb\" src=".concat(recipe.thumbnail, "> </img>\n        <a href=\"javascript:void(0)\" recipe=\"").concat(recipe.id, "\" onclick={}>").concat(recipe.name, "</a>"); //let element = recipeElement.outerHTML
+        //console.log(recipeElement);
+        // console.log(content);
+
+        content.append(recipeElement);
+        u++;
+      }); //sessionStorage.setItem("results", "")
+    }
+  }]);
+
+  return Recipe;
+}(React.Component);
+
+var Playlist = /*#__PURE__*/function (_React$Component4) {
+  _inherits(Playlist, _React$Component4);
+
+  var _super4 = _createSuper(Playlist);
+
+  function Playlist(props) {
+    var _this8;
+
+    _classCallCheck(this, Playlist);
+
+    _this8 = _super4.call(this, props);
+
+    _defineProperty(_assertThisInitialized(_this8), "instructions", function (instructObj) {
+      var orderedList = document.createElement("ol");
+      orderedList.id = "instructions";
+      instructObj.forEach(function (obj) {
+        orderedList.innerHTML += "<li>".concat(obj.display_text, "</li>"); //////console.log(obj.display_text);
+      });
+      return orderedList.outerHTML;
+    });
+
+    _defineProperty(_assertThisInitialized(_this8), "saveRecipe", function (e) {
+      console.log("saveRecipe"); // console.log(e);
+
+      var params = new URL(document.location).searchParams;
+      var food = params.get("food") || sessionStorage.getItem("food");
+      console.log(food);
+      var tag = params.get("tag") || sessionStorage.getItem("tag");
+      var id = params.get("id");
+      var name = document.body.querySelector('#name').textContent;
+      name = name.replace('&', "and");
+      var thumbnail = document.body.querySelector('#recipeImg').src; ////console.log(thumbnail)
+
+      var urlPath = "/recipe-playlist?food=".concat(food, "&tag=").concat(tag, "&id=").concat(id, "&name=").concat(name, "&thumbnail=").concat(thumbnail);
+      console.log(urlPath);
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", urlPath); //////console.log(xhr.HEADERS_RECEIVED)
+
+      xhr.send();
+      return true;
+    });
+
+    _defineProperty(_assertThisInitialized(_this8), "getRecipe", function () {
+      // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
+      // the `target` property of that event points at the element that sent the event, in this case a button
+      //////console.log(`An element of id=${e.target.id} was clicked!`);
+      var params = new URL(document.location).searchParams;
+      var food = params.get("food"); // || sessionStorage.getItem("food")
+
+      var tag = params.get("tag"); //|| sessionStorage.getItem("tag")
+
+      var id = params.get("id");
+      console.log(food);
+      var data = null;
+      var xhr = new XMLHttpRequest();
+
+      var self = _assertThisInitialized(_this8);
+
+      xhr.withCredentials = false;
+      xhr.addEventListener("readystatechange", function () {
+        if (this.readyState === this.DONE) {
+          //sessionStorage.setItem("recipe", this.responseText)
+          var json = JSON.parse(this.responseText); //////console.log(json);
+
+          var recipe = {
+            name: json.name,
+            description: json.description || "",
+            country: json.country,
+            language: json.language,
+            prepTimeMinutes: json.prep_time_minutes,
+            cookTimeMinutes: json.cook_time_minutes,
+            totalTimeMinutes: json.total_time_minutes,
+            timeTier: json.total_time_tier,
+            num_servings: json.num_servings,
+            video: json.original_video_url,
+            instructions: json.instructions,
+            nutrition: json.nutrition,
+            tags: json.tags,
+            feed: json.recirc_feeds,
+            credits: json.credits,
+            thumbnail: json.thumbnail_url,
+            topics: json.topics,
+            rating: json.user_ratings
+          }; ////console.log(recipe);
+
+          var displayImg = document.body.querySelector("#recipeImg");
+          displayImg.src = recipe.thumbnail;
+          document.querySelector('#name').textContent = recipe.name;
+          var details = document.querySelector("#details");
+          details.innerHTML = "\n        <p>".concat(recipe.description, "</p>\n        <h2>Instructions:</h2>\n        ").concat(self.instructions(recipe.instructions)); //////console.log(this.responseText);
+        }
+      });
+      console.log(id);
+      xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/detail?id=" + id);
+      xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
+      xhr.setRequestHeader("x-rapidapi-key", "63f6ab95cemshe9b57c799d2aff1p19c240jsn4a5093e49c83");
+      xhr.send(data);
+    });
+
+    console.log("Recipe");
+
+    _this8.init();
+
+    return _this8;
+  }
+
+  _createClass(Playlist, [{
+    key: "init",
+    value: function init() {
+      this.getRecipe();
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      return /*#__PURE__*/React.createElement("div", {
+        className: "content-wrap"
+      }, /*#__PURE__*/React.createElement("h1", {
+        className: "title"
+      }, "Search Results"), /*#__PURE__*/React.createElement("nav", {
+        className: "nav"
+      }, /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "/logout"
+      }, "Logout")), /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "#"
+      }, "Recipe Client"))), /*#__PURE__*/React.createElement("h2", {
+        id: "name"
+      }, "TITLE"), /*#__PURE__*/React.createElement("p", {
+        id: "p"
+      }, "Hit the \"Save Recipe\" button to store a recipe in your list"), /*#__PURE__*/React.createElement("button", {
+        id: "save",
+        onClick: this.saveRecipe
+      }, "Save Recipe"), /*#__PURE__*/React.createElement("div", {
+        className: "content"
+      }, /*#__PURE__*/React.createElement("div", {
+        id: "content"
+      }, /*#__PURE__*/React.createElement("div", {
+        id: "sel"
+      }, /*#__PURE__*/React.createElement("div", {
+        id: "selected"
+      }, /*#__PURE__*/React.createElement("img", {
+        id: "recipeImg",
+        src: "#",
+        alt: ""
+      }), /*#__PURE__*/React.createElement("div", {
+        id: "details"
+      }))))));
+    }
+  }, {
+    key: "displayRecipies",
+    value: function displayRecipies(dataString) {
+      var _data$results3;
+
+      console.log("Parsing Recipies");
+      var content = document.querySelector('#content');
+      var data = dataString.result; ////console.log(dataString.results);
+      //console.log(document.body);
+
+      var u = 0; //sessionStorage.setItem("results", "")
+
+      data === null || data === void 0 ? void 0 : (_data$results3 = data.results) === null || _data$results3 === void 0 ? void 0 : _data$results3.forEach(function (recipe) {
+        //console.log(recipe);
+        var recipeElement = document.createElement('recipe');
+
+        if (u == 0) {////console.log(params);
+        } // sessionStorage.setItem("recipe", JSON.stringify(recipe))
+
+
+        recipeElement.innerHTML = "<img id=\"thumb\" src=".concat(recipe.thumbnail, "> </img>\n        <a href=\"javascript:void(0)\" recipe=\"").concat(recipe.id, "\" onclick={}>").concat(recipe.name, "</a>"); //let element = recipeElement.outerHTML
+        //console.log(recipeElement);
+        // console.log(content);
+
+        content.append(recipeElement);
+        u++;
+      }); //sessionStorage.setItem("results", "")
+    }
+  }]);
+
+  return Playlist;
+}(React.Component);
+
 var createWindow = function createWindow(csrf) {
   //console.log(window.location.pathname);
   if (window.location.pathname == "/recipes") {
     ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(Search, null)), document.getElementById("root") // querySelector("#nav")
+    );
+  } else if (window.location.pathname == "/recipe") {
+    ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(Recipe, null)), document.getElementById("root") // querySelector("#nav")
     );
   } else {
     ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(Finder, null)), document.getElementById("root") // querySelector("#nav")
@@ -368,11 +771,11 @@ var createWindow = function createWindow(csrf) {
 
 };
 
-var getLogin = function getLogin() {
+var init = function init() {
   createWindow();
 };
 
-window.onload = getLogin;
+window.onload = init;
 "use strict";
 
 var handleDomo = function handleDomo(e) {

@@ -1,6 +1,13 @@
 const http = require('https');
+// const url = require('url');
+// const querystring = require('querystring');
 // const query = require('querystring');
-// const models = require('../models');
+const models = require('../models');
+const {
+  authenticate, findByOwner, // findByID, deleteRecipe,
+} = require('../models/Playlist');
+
+const { Playlist } = models;
 const { defaultSearch } = require('./defaults');
 
 const userSearchParameters = [];
@@ -57,7 +64,7 @@ const POSTSearchedRecipes = (req, res) => {
     path: `/recipes/list?from=0&size=20&tags=${tag}&q=${food}`,
     headers: {
       'x-rapidapi-host': 'tasty.p.rapidapi.com',
-      'x-rapidapi-key': '170e038a70mshc48a677384b7b29p120f51jsn123cfd31d18c',
+      'x-rapidapi-key': '63f6ab95cemshe9b57c799d2aff1p19c240jsn4a5093e49c83',
       useQueryString: true,
     },
   };
@@ -118,8 +125,107 @@ const POSTSearchedRecipes = (req, res) => {
   return res.json({ userSearchParameters });
   // res.redirect('/recipes')
 };
+let activeOwner = '61a84caa7017659683108bd8';
+const POSTRecipeToPlaylist = (req, res) => {
+  console.log('POSTRecipeToPlaylist');
+  // console.log(req.query);
+  // let query = new URLSearchParams(req.query);
+  const { query } = req; // url.parse(req.Search, true); //querystring.parse(req.query)
+  // console.log(query);
+  const food = `${query.food}`;
+  const tag = `${query.tag}`;
+  const id = `${query.id}`;
+  const name = `${query.name}`;
+  const thumbnail = `${query.thumbnail}`;
+  // console.log(thumbnail);
+  if (!food || !tag || !id || !thumbnail || !name) { // just need to check search fields
+    return res.status(400).json({ error: 'RAWR! All fields are required' });
+  }
+  /* deleteRecipe(id, (err)=>{
+    console.log(err);
+  }) */
+  // Playlist.PlaylistModel
+  return authenticate(id, (doc) => {
+    // console.log(req.session.account);
+    // activeAccount = req.session.account._id
+    const accountData = {
+      id,
+      food,
+      tag,
+      thumbnail,
+      name,
+      owner: req.session.account.owner,
+    };
+    activeOwner = accountData.owner;
+    console.log('accountData');
+    console.log(accountData);
+    let newRecipe;
+    let savePromise;
+    if (doc === undefined) {
+      console.log('NEW RECIPE');
+      newRecipe = new Playlist.PlaylistModel(accountData);
+      savePromise = newRecipe.save();
+      savePromise.then(() => {
+        req.session.recipe = Playlist.PlaylistModel.toAPI(newRecipe);
+        // console.log("RECIPE THEN");
+        console.log(req.session.recipe);
+        // return res.status(200).json({ redirect: '/finder' });
+      });
+
+      savePromise.catch((err) => {
+        // console.log(err);
+
+        if (err.code === 11000) {
+          // return res.status(400).json({ error: 'Recipe ID already present.' });
+        }
+
+        // return res.status(200).json({ error: 'An error occured' });
+      });
+    } else {
+      console.log('DELETE');
+      console.log('doc');
+      // console.log(doc);
+      /* findByID(doc.id, (err, data)=>{
+        if (err) {
+          console.log(err);
+          return res.status(400).json({ error: 'An error occurred' });
+        }
+        console.log("FOUND");
+        console.log(data);
+
+      }) */
+      // console.log(r);
+      // return res.status(200).json({ message: 'Posted' });
+      return res.status(400).json({ error: 'Recipe ID already present.' });
+    }
+
+    // savePromise = newRecipe.save();
+
+    return res.status(200).json({ message: 'Posted' });
+  });
+};
+// let def = '61971896bbb2909349ca3c26'
+const GETPlaylistJSON = (req, res) => {
+  // console.log(req.session);
+  findByOwner(activeOwner, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(400).json({ error: 'An error occurred' });
+    }
+
+    console.log('Callback');
+    console.log(data);
+    // return data
+    res.status(200).json({ playlist: data });
+    return data;
+  });
+
+  return res.status(200); // res.json({ data: req.session });
+};
 
 module.exports = {
   POSTSearchedRecipes,
   GETSearchedRecipes,
+  POSTRecipeToPlaylist,
+  GETPlaylistJSON,
 };

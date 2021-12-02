@@ -80,6 +80,7 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
       var path = document.querySelector("#loginForm").getAttribute("action");
       var query = this.createQuery(); //const completionCallback = redirect("/finder");
 
+      console.log("LOGIN");
       console.log(query); //console.log("LoginCLIENT");
 
       sendAjax(method, path, query, function () {
@@ -90,6 +91,7 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
   }, {
     key: "render",
     value: function render() {
+      sessionStorage.clear();
       return /*#__PURE__*/React.createElement("div", {
         className: "content-wrap"
       }, /*#__PURE__*/React.createElement("h1", {
@@ -207,10 +209,7 @@ var SignupWindow = /*#__PURE__*/function (_React$Component2) {
   }, {
     key: "handleSignup",
     value: function handleSignup(e) {
-      e.preventDefault();
-      $("#domoMessage").animate({
-        width: 'hide'
-      }, 350);
+      e.preventDefault(); //$("#domoMessage").animate({width:'hide'},350);
 
       if (!this.checkFields()) {
         handleError("RAWR! All fields are required!");
@@ -224,9 +223,11 @@ var SignupWindow = /*#__PURE__*/function (_React$Component2) {
 
       var method = "POST";
       var path = document.querySelector("#signupForm").getAttribute("action");
-      var query = this.createQuery();
-      var completionCallback = redirect;
-      sendAjax(method, path, query, completionCallback);
+      var query = this.createQuery(); // const completionCallback = redirect;
+
+      sendAjax(method, path, query, function () {
+        window.location = "/login";
+      });
       return false;
     }
   }, {

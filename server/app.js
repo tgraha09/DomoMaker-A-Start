@@ -15,14 +15,15 @@ const session = require('express-session');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const dbURL = process.env.MONGODB_URI
-|| 'mongodb+srv://tfire09:Facetime217!@cluster0.qga9p.mongodb.net/myFirstDatabaseAAAA?retryWrites=true&w=majority'
-|| 'mongodb://localhost/DomoMakerAAAA';
+|| 'mongodb+srv://tfire09:Facetime217!@cluster0.qga9p.mongodb.net/myFirstDatabase?retryWrites=true&w=majority'
+|| 'mongodb://localhost/DomoMaker';
 
 mongoose.connect(dbURL, (err) => {
   if (err) {
     console.log('Could not connect to database');
     throw err;
   }
+  // mongoose.connection.db.dropDatabase();
 });
 
 /* let redisURL = {

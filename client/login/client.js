@@ -11,6 +11,7 @@
       };
       this.handleChange = this.handleChange.bind(this);
       this.handleLogin = this.handleLogin.bind(this);
+      
     }
   
     handleChange(e){
@@ -39,6 +40,7 @@
       const path = document.querySelector("#loginForm").getAttribute("action");
       const query = this.createQuery();
      //const completionCallback = redirect("/finder");
+     console.log("LOGIN")
       console.log(query)
       //console.log("LoginCLIENT");
       sendAjax(method,path,query,()=>{
@@ -49,6 +51,7 @@
     };
   
     render() {
+      sessionStorage.clear()
       return (<div className="content-wrap">
       <h1 className="title">Recipe Finder</h1>
         <nav className="nav">
@@ -124,7 +127,7 @@ const Display = ({ ...props }) => {
   
     handleSignup(e){
       e.preventDefault();
-      $("#domoMessage").animate({width:'hide'},350);
+      //$("#domoMessage").animate({width:'hide'},350);
       
       if(!this.checkFields()){
         handleError("RAWR! All fields are required!");
@@ -139,8 +142,10 @@ const Display = ({ ...props }) => {
       const method = "POST";
       const path = document.querySelector("#signupForm").getAttribute("action");
       const query = this.createQuery();
-      const completionCallback = redirect;
-      sendAjax(method,path,query,completionCallback);
+     // const completionCallback = redirect;
+      sendAjax(method,path,query,()=>{
+        window.location = "/login"
+      });
     
       return false;
     }
