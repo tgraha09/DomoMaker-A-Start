@@ -43,6 +43,7 @@
   
 }
 
+
 .content-wrap{
   display: flex;
   flex-direction: column;
@@ -87,6 +88,9 @@
   margin-bottom: 30vh;
 }
 
+#foodName{
+  color: white;
+}
 
 #content{
   position: relative;
@@ -96,6 +100,7 @@
   margin-top: 1rem;
   flex-wrap: wrap;
   overflow-y: scroll;
+  color: white;
 }
 #content::-webkit-scrollbar {
   display: none;

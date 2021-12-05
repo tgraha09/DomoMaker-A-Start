@@ -171,7 +171,13 @@ var Finder = /*#__PURE__*/function (_React$Component) {
         className: "link",
         id: "logout",
         href: "/recipes"
-      }, "Search Results"))), /*#__PURE__*/React.createElement("h3", {
+      }, "Search Results")), /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "/playlist"
+      }, "Playlist"))), /*#__PURE__*/React.createElement("h3", {
         className: "desc"
       }, "Search a recipe by its food and cuisine tag."), /*#__PURE__*/React.createElement("div", {
         className: "content"
@@ -320,8 +326,8 @@ var Search = /*#__PURE__*/function (_React$Component2) {
       }, /*#__PURE__*/React.createElement("a", {
         className: "link",
         id: "logout",
-        href: "/recipes"
-      }, "Search Results"))), /*#__PURE__*/React.createElement("h3", {
+        href: "/playlist"
+      }, "Playlist"))), /*#__PURE__*/React.createElement("h3", {
         className: "desc"
       }, "Results"), /*#__PURE__*/React.createElement("div", {
         className: "content"
@@ -508,7 +514,13 @@ var Recipe = /*#__PURE__*/function (_React$Component3) {
         className: "link",
         id: "logout",
         href: "/finder"
-      }, "Finder"))), /*#__PURE__*/React.createElement("h2", {
+      }, "Finder")), /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", {
+        className: "link",
+        id: "logout",
+        href: "/playlist"
+      }, "Playlist"))), /*#__PURE__*/React.createElement("h2", {
         id: "name"
       }, "TITLE"), /*#__PURE__*/React.createElement("p", {
         id: "p"
@@ -576,13 +588,8 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
 
     _this8 = _super4.call(this, props);
 
-    _defineProperty(_assertThisInitialized(_this8), "instructions", function (instructObj) {
-      var orderedList = document.createElement("ol");
-      orderedList.id = "instructions";
-      instructObj.forEach(function (obj) {
-        orderedList.innerHTML += "<li>".concat(obj.display_text, "</li>"); //////console.log(obj.display_text);
-      });
-      return orderedList.outerHTML;
+    _defineProperty(_assertThisInitialized(_this8), "handleResponse", function (e) {
+      sessionStorage.setItem("playlist", e.target.responseText);
     });
 
     _defineProperty(_assertThisInitialized(_this8), "saveRecipe", function (e) {
@@ -606,61 +613,20 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
       return true;
     });
 
-    _defineProperty(_assertThisInitialized(_this8), "getRecipe", function () {
+    _defineProperty(_assertThisInitialized(_this8), "getPlaylist", function () {
       // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
       // the `target` property of that event points at the element that sent the event, in this case a button
       //////console.log(`An element of id=${e.target.id} was clicked!`);
-      var params = new URL(document.location).searchParams;
-      var food = params.get("food"); // || sessionStorage.getItem("food")
-
-      var tag = params.get("tag"); //|| sessionStorage.getItem("tag")
-
-      var id = params.get("id");
-      console.log(food);
-      var data = null;
+      var recipeURL = "/recipe-playlist";
       var xhr = new XMLHttpRequest();
 
-      var self = _assertThisInitialized(_this8);
+      xhr.onload = function (e) {
+        return _this8.handleResponse(e);
+      };
 
-      xhr.withCredentials = false;
-      xhr.addEventListener("readystatechange", function () {
-        if (this.readyState === this.DONE) {
-          //sessionStorage.setItem("recipe", this.responseText)
-          var json = JSON.parse(this.responseText); //////console.log(json);
-
-          var recipe = {
-            name: json.name,
-            description: json.description || "",
-            country: json.country,
-            language: json.language,
-            prepTimeMinutes: json.prep_time_minutes,
-            cookTimeMinutes: json.cook_time_minutes,
-            totalTimeMinutes: json.total_time_minutes,
-            timeTier: json.total_time_tier,
-            num_servings: json.num_servings,
-            video: json.original_video_url,
-            instructions: json.instructions,
-            nutrition: json.nutrition,
-            tags: json.tags,
-            feed: json.recirc_feeds,
-            credits: json.credits,
-            thumbnail: json.thumbnail_url,
-            topics: json.topics,
-            rating: json.user_ratings
-          }; ////console.log(recipe);
-
-          var displayImg = document.body.querySelector("#recipeImg");
-          displayImg.src = recipe.thumbnail;
-          document.querySelector('#name').textContent = recipe.name;
-          var details = document.querySelector("#details");
-          details.innerHTML = "\n        <p>".concat(recipe.description, "</p>\n        <h2>Instructions:</h2>\n        ").concat(self.instructions(recipe.instructions)); //////console.log(this.responseText);
-        }
-      });
-      console.log(id);
-      xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/detail?id=" + id);
-      xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
-      xhr.setRequestHeader("x-rapidapi-key", "63f6ab95cemshe9b57c799d2aff1p19c240jsn4a5093e49c83");
-      xhr.send(data);
+      xhr.open("GET", recipeURL);
+      xhr.setRequestHeader('Accept', "application/javascript");
+      xhr.send();
     });
 
     console.log("Recipe");
@@ -673,7 +639,13 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
   _createClass(Playlist, [{
     key: "init",
     value: function init() {
-      this.getRecipe();
+      var _this9 = this;
+
+      this.getPlaylist();
+      getSessionStorage("playlist", function (dataString) {
+        //console.log(dataString);
+        _this9.displayRecipies(JSON.parse(dataString));
+      });
     }
   }, {
     key: "render",
@@ -695,55 +667,36 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
       }, /*#__PURE__*/React.createElement("a", {
         className: "link",
         id: "logout",
-        href: "#"
-      }, "Recipe Client"))), /*#__PURE__*/React.createElement("h2", {
+        href: "/finder"
+      }, "Finder"))), /*#__PURE__*/React.createElement("h2", {
         id: "name"
-      }, "TITLE"), /*#__PURE__*/React.createElement("p", {
+      }, "Playlist"), /*#__PURE__*/React.createElement("p", {
         id: "p"
-      }, "Hit the \"Save Recipe\" button to store a recipe in your list"), /*#__PURE__*/React.createElement("button", {
-        id: "save",
-        onClick: this.saveRecipe
-      }, "Save Recipe"), /*#__PURE__*/React.createElement("div", {
+      }), /*#__PURE__*/React.createElement("div", {
         className: "content"
       }, /*#__PURE__*/React.createElement("div", {
-        id: "content"
-      }, /*#__PURE__*/React.createElement("div", {
-        id: "sel"
-      }, /*#__PURE__*/React.createElement("div", {
-        id: "selected"
-      }, /*#__PURE__*/React.createElement("img", {
-        id: "recipeImg",
-        src: "#",
-        alt: ""
-      }), /*#__PURE__*/React.createElement("div", {
-        id: "details"
-      }))))));
+        id: "content",
+        "class": "results"
+      })));
     }
   }, {
     key: "displayRecipies",
     value: function displayRecipies(dataString) {
-      var _data$results3;
+      var content = document.body.querySelector('#content');
+      var data = dataString.playlist; ////console.log(dataString.results);
 
-      console.log("Parsing Recipies");
-      var content = document.querySelector('#content');
-      var data = dataString.result; ////console.log(dataString.results);
-      //console.log(document.body);
-
+      console.log(data);
       var u = 0; //sessionStorage.setItem("results", "")
+      //console.log(data)
 
-      data === null || data === void 0 ? void 0 : (_data$results3 = data.results) === null || _data$results3 === void 0 ? void 0 : _data$results3.forEach(function (recipe) {
-        //console.log(recipe);
-        var recipeElement = document.createElement('recipe');
+      data === null || data === void 0 ? void 0 : data.forEach(function (recipe) {
+        if (recipe != null) {
+          // console.log(recipe)
+          var food = recipe.food;
+          var tag = recipe.tag;
+          content.innerHTML += "<div class=\"wrap\">\n                <img id=\"recipeImg\" src=".concat(recipe === null || recipe === void 0 ? void 0 : recipe.thumbnail, " alt=\"\">\n                <h3 recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" id=\"foodName\" for=\"name\">").concat(recipe === null || recipe === void 0 ? void 0 : recipe.name, "</h3>\n                <p><b>Food:</b> ").concat(food, "</p>\n                <p><b>Tag:</b> ").concat(tag, "</p>\n                <p><b>ID:</b> ").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "</p>\n                <input recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" id=\"name\" name=\"name\" value=\"\"/>\n                <div id=\"buttonWrap\"><button idx=").concat(u, " recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" onclick=\"save(this)\">Save Name</button> <button onclick=\"deleteRecipe(this)\" idx=").concat(u, " recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\">Delete</button></div>\n              </div>");
+        }
 
-        if (u == 0) {////console.log(params);
-        } // sessionStorage.setItem("recipe", JSON.stringify(recipe))
-
-
-        recipeElement.innerHTML = "<img id=\"thumb\" src=".concat(recipe.thumbnail, "> </img>\n        <a href=\"javascript:void(0)\" recipe=\"").concat(recipe.id, "\" onclick={}>").concat(recipe.name, "</a>"); //let element = recipeElement.outerHTML
-        //console.log(recipeElement);
-        // console.log(content);
-
-        content.append(recipeElement);
         u++;
       }); //sessionStorage.setItem("results", "")
     }
@@ -759,6 +712,9 @@ var createWindow = function createWindow(csrf) {
     );
   } else if (window.location.pathname == "/recipe") {
     ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(Recipe, null)), document.getElementById("root") // querySelector("#nav")
+    );
+  } else if (window.location.pathname == "/playlist") {
+    ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(Playlist, null)), document.getElementById("root") // querySelector("#nav")
     );
   } else {
     ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(Finder, null)), document.getElementById("root") // querySelector("#nav")

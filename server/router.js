@@ -30,6 +30,10 @@ const router = (app) => {
     // console.log('/recipe');
     res.render('app');
   });
+  app.get('/playlist', mid.requiresLogin, (req, res) => {
+    // console.log('/recipe');
+    res.render('app');
+  });
 
   app.post('/login', mid.requiresSecure, mid.requiresLogout, controllers.Account.login); // mid.requiresSecure, mid.requiresLogout,
   app.post('/signup', mid.requiresSecure, mid.requiresLogout, controllers.Account.signup); // mid.requiresSecure, mid.requiresLogout,

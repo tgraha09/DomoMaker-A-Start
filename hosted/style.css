@@ -155,6 +155,10 @@
     max-width: 200px;
   }
 
+  .wrap{
+   color: white; 
+  }
+
   .main{
     background-color: rgb(25, 25, 51);
     position: relative;

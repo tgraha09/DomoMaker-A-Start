@@ -125,7 +125,7 @@ class Finder extends React.Component{
     <nav className="nav">  
         <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>
         <div className="linkWrap" ><a className="link" id="logout" href="/recipes" >Search Results</a></div>
-        
+        <div className="linkWrap" ><a className="link" id="logout" href="/playlist" >Playlist</a></div>
     
     </nav>
     <h3 className="desc">
@@ -220,7 +220,7 @@ class Search extends React.Component{
     <nav className="nav">  
         <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>
         <div className="linkWrap" ><a className="link" id="logout" href="/finder" >Finder</a></div>
-        <div className="linkWrap" ><a className="link" id="logout" href="/recipes" >Search Results</a></div>
+        <div className="linkWrap" ><a className="link" id="logout" href="/playlist" >Playlist</a></div>
         
     </nav>
     <h3 className="desc">
@@ -397,7 +397,7 @@ class Recipe extends React.Component{
   <nav className="nav">  
       <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>
       <div className="linkWrap" ><a className="link" id="logout" href="/finder" >Finder</a></div>
-     
+      <div className="linkWrap" ><a className="link" id="logout" href="/playlist" >Playlist</a></div>
   
   </nav>
   <h2 id="name">TITLE</h2>
@@ -462,19 +462,18 @@ class Playlist extends React.Component{
   }
 
   init(){
-    this.getRecipe()
+    this.getPlaylist()
     
+    getSessionStorage("playlist", (dataString)=>{
+      //console.log(dataString);
+      this.displayRecipies(JSON.parse(dataString))
+      
+    })
     
   }
 
-  instructions = (instructObj)=>{
-    let orderedList = document.createElement("ol")
-    orderedList.id = "instructions"
-    instructObj.forEach(obj => {
-      orderedList.innerHTML+= `<li>${obj.display_text}</li>`
-      //////console.log(obj.display_text);
-    });
-    return orderedList.outerHTML
+  handleResponse = (e)=>{
+    sessionStorage.setItem("playlist", e.target.responseText)
   }
 
   saveRecipe = (e) => {
@@ -499,65 +498,21 @@ class Playlist extends React.Component{
     return true;
   };
 
-  getRecipe = () => {
+  getPlaylist = () => {
     // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
     // the `target` property of that event points at the element that sent the event, in this case a button
     //////console.log(`An element of id=${e.target.id} was clicked!`);
-    let params = (new URL(document.location)).searchParams;
-    let food = params.get("food")// || sessionStorage.getItem("food")
-    let tag = params.get("tag") //|| sessionStorage.getItem("tag")
-    let id = params.get("id")
-    console.log(food)
-    const data = null;
+    const recipeURL = `/recipe-playlist`;
     const xhr = new XMLHttpRequest();
-    let self = this
+    
+    xhr.onload = (e)=> this.handleResponse(e)
+    
+    
+    xhr.open("GET", recipeURL);
+    xhr.setRequestHeader('Accept', "application/javascript");
+    xhr.send();
   
-    xhr.withCredentials = false;
-
-    xhr.addEventListener("readystatechange", function () {
-      if (this.readyState === this.DONE) {
-        //sessionStorage.setItem("recipe", this.responseText)
-        let json = JSON.parse(this.responseText)
-        //////console.log(json);
-        const recipe = {
-          name: json.name,
-          description: json.description || "",
-          country: json.country,
-          language: json.language,
-          prepTimeMinutes: json.prep_time_minutes,
-          cookTimeMinutes: json.cook_time_minutes,
-          totalTimeMinutes: json.total_time_minutes,
-          timeTier: json.total_time_tier,
-          num_servings: json.num_servings,
-          video: json.original_video_url,
-          instructions: json.instructions,
-          nutrition: json.nutrition,
-          tags: json.tags,
-          feed: json.recirc_feeds,
-          credits: json.credits,
-          thumbnail: json.thumbnail_url,
-          topics: json.topics,
-          rating: json.user_ratings,
-        };
-        ////console.log(recipe);
-        
-        let displayImg = document.body.querySelector("#recipeImg")
-        displayImg.src = recipe.thumbnail
-        document.querySelector('#name').textContent = recipe.name
-        let details = document.querySelector("#details")
-        details.innerHTML = `
-        <p>${recipe.description}</p>
-        <h2>Instructions:</h2>
-        ${self.instructions(recipe.instructions)}`
-        //////console.log(this.responseText);
-      }
-    });
-    console.log(id);
-    xhr.open("GET", "https://tasty.p.rapidapi.com/recipes/detail?id="+id);
-    xhr.setRequestHeader("x-rapidapi-host", "tasty.p.rapidapi.com");
-    xhr.setRequestHeader("x-rapidapi-key", "63f6ab95cemshe9b57c799d2aff1p19c240jsn4a5093e49c83");
-
-    xhr.send(data);
+    
   }
 
   
@@ -570,56 +525,50 @@ class Playlist extends React.Component{
   <h1 className="title">Search Results</h1>
   <nav className="nav">  
       <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>
-      <div className="linkWrap" ><a className="link" id="logout" href="#" >Recipe Client</a></div>
+      <div className="linkWrap" ><a className="link" id="logout" href="/finder" >Finder</a></div>
   
   </nav>
-  <h2 id="name">TITLE</h2>
-  <p id="p">Hit the "Save Recipe" button to store a recipe in your list</p>
-  <button id="save" onClick={this.saveRecipe}>Save Recipe</button>
-  <div className="content">
-  <div id="content">
-  
-    <div id="sel">
-      <div id="selected">
-        <img id="recipeImg" src="#" alt=""/>
-        <div id="details">
+  <h2 id="name">Playlist</h2>
+  <p id="p"></p>
+    <div className="content">
+      <div id="content" class="results">
+      
+
+      
+      
+        </div>
+      
+    
       </div>
-    </div>
-    </div>
-  
-  
-    </div>
-  
-  
-    </div>
     </div>);
   }
 
   displayRecipies(dataString){
-    console.log("Parsing Recipies");
-    let content = document.querySelector('#content')
-    let data = dataString.result
+    let content = document.body.querySelector('#content')
+    let data = dataString.playlist
     ////console.log(dataString.results);
-    //console.log(document.body);
+    console.log(data);
     let u = 0;
+    
     //sessionStorage.setItem("results", "")
-    data?.results?.forEach(recipe => {
-      //console.log(recipe);
-      let recipeElement = document.createElement('recipe')
-      
-  
-      if(u == 0){
-        ////console.log(params);
+    //console.log(data)
+    
+    data?.forEach(recipe => {
+      if(recipe != null){
+        // console.log(recipe)
+        let food = recipe.food 
+        let tag = recipe.tag
+        content.innerHTML+=`<div class="wrap">
+                <img id="recipeImg" src=${recipe?.thumbnail} alt="">
+                <h3 recipe="${recipe?.id}" id="foodName" for="name">${recipe?.name}</h3>
+                <p><b>Food:</b> ${food}</p>
+                <p><b>Tag:</b> ${tag}</p>
+                <p><b>ID:</b> ${recipe?.id}</p>
+                <input recipe="${recipe?.id}" id="name" name="name" value=""/>
+                <div id="buttonWrap"><button idx=${u} recipe="${recipe?.id}" onclick="save(this)">Save Name</button> <button onclick="deleteRecipe(this)" idx=${u} recipe="${recipe?.id}">Delete</button></div>
+              </div>`
       }
-     // sessionStorage.setItem("recipe", JSON.stringify(recipe))
-                
-      recipeElement.innerHTML = 
-      `<img id="thumb" src=${recipe.thumbnail}> </img>
-        <a href="javascript:void(0)" recipe="${recipe.id}" onclick={}>${recipe.name}</a>`
-      //let element = recipeElement.outerHTML
-      //console.log(recipeElement);
-     // console.log(content);
-      content.append(recipeElement)
+      
       u++;
     });
     
@@ -639,6 +588,13 @@ const createWindow = csrf => {
     else if(window.location.pathname=="/recipe"){
       ReactDOM.render(<Display>
           <Recipe />
+      </Display>,
+        document.getElementById("root")// querySelector("#nav")
+      );
+    }
+    else if(window.location.pathname=="/playlist"){
+      ReactDOM.render(<Display>
+          <Playlist />
       </Display>,
         document.getElementById("root")// querySelector("#nav")
       );
