@@ -25,14 +25,33 @@
   color: white;
 }
 
-#name{
+h2#name{
+  color: white;
+}
+
+#playlist{
+  color: white;
+}
+
+.hardLink{
+  color: white;
+}
+
+
+
+recipe>a{
+  color: white;
+  padding: 1vh;
+}
+recipe>a:visited{
   color: white;
 }
 
 #recipeImg{
-  max-width: 400px;
-  max-height: 400px;
+  max-width: 300px;
+  max-height: 250px;
   margin: auto;
+  padding: 2vh;
 }
 
 #selected{
@@ -45,6 +64,12 @@
 #details{
   color: white;
   max-width: 400px;
+  max-height: 400px;
+  overflow-y: scroll;
+}
+
+#details::-webkit-scrollbar {
+  display: none;
 }
 
 .title{
@@ -157,7 +182,17 @@
 
   .wrap{
    color: white; 
+   height: fit-content;
   }
+
+  .wrap > #foodName{
+    margin: 0;
+  }
+
+  .wrap > p{
+    margin: 0;
+  }
+
 
   .main{
     background-color: rgb(25, 25, 51);

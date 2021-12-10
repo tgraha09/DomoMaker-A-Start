@@ -24,25 +24,34 @@ class Finder extends React.Component{
       let recipeTagInput = $('#tagInput') //document.body.querySelector('.tagInput')
       let searchFood = $('#food') // document.body.querySelector('#food')
       let food = searchFood.val() //.value || searchFood.defaultValue
-      let tag = recipeTagInput.val() || "american" //.value || recipeTagInput.defaultValue
+      let tag = recipeTagInput.val() //|| "american" //.value || recipeTagInput.defaultValue
       sessionStorage.setItem("food", food)
       sessionStorage.setItem("tag", tag)
       const formAction = searchform.getAttribute("action");
       const formMethod = searchform.getAttribute("method");
-      //let data = `?food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
-      let data = formAction + `?&food=${food}&tag=${tag}`
-      console.log(data)
-      
-      sendAjax(formMethod,'/recipes-json',data,()=>{
-        console.log({data});
-        console.log(`Send to ${formAction}`);
-      });
-      setTimeout(() => {
+
+      if(food === '' || food=== undefined || tag === '' || tag ===undefined){
+        alert("RAWR! All fields are required!");
+        return false;
+      }
+      else{
+        let data = formAction + `?&food=${food}&tag=${tag}`
+        console.log(data)
         
-       window.location = `/recipes?&food=${food}&tag=${tag}`
-      }, 2000);
-      //window.location = `/recipes?&food=${food}&tag=${tag}`
+        sendAjax(formMethod,'/recipes-json',data,()=>{
+          console.log({data});
+          console.log(`Send to ${formAction}`);
+        });
+        setTimeout(() => {
+          let loc = `/recipes?&food=${food}&tag=${tag}`
+          window.location = loc
+        }, 2000);
+      }
       
+      //let data = `?food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
+      
+      //window.location = `/recipes?&food=${food}&tag=${tag}`
+      return true;
       //console.log("Sent");
     }
   
@@ -177,6 +186,7 @@ class Search extends React.Component{
       getSessionStorage("results", (dataString)=>{
         //console.log(dataString);
         this.displayRecipies(JSON.parse(dataString))
+        
         ////console.log(dataString);
         //displayRecipies(dataString)
         //sessionStorage.setItem("results", "")
@@ -190,6 +200,7 @@ class Search extends React.Component{
       let tag = params.get("tag");
       
       const recipeURL = `/recipes-json?food=${food}&tag=${tag}`;
+      console.log(recipeURL);
       const xhr = new XMLHttpRequest();
       
       xhr.onload = (e)=> this.handleResponse(e, food, tag)
@@ -293,6 +304,15 @@ class Recipe extends React.Component{
     
   }
 
+   back = (e)=>{
+    let link = e.target //document.querySelector(".hardlink")
+    let params = (new URL(document.location)).searchParams;
+    let food = params.get("food")|| sessionStorage.getItem("food") || "Beef"
+    let tag = params.get("tag") || sessionStorage.getItem("tag") || "american"
+    link.href = `recipes?&food=${food}&tag=${tag}`
+    console.log(link);
+   }
+
   instructions = (instructObj)=>{
     let orderedList = document.createElement("ol")
     orderedList.id = "instructions"
@@ -305,6 +325,7 @@ class Recipe extends React.Component{
 
   saveRecipe = (e) => {
     console.log("saveRecipe");
+    e.target.disabled = true;
    // console.log(e);
     let params = (new URL(document.location)).searchParams;
     let food = params.get("food")|| sessionStorage.getItem("food")
@@ -396,9 +417,9 @@ class Recipe extends React.Component{
   <h1 className="title">Search Results</h1>
   <nav className="nav">  
       <div className="linkWrap" ><a className="link" id="logout" href="/logout" >Logout</a></div>
-      <div className="linkWrap" ><a className="link" id="logout" href="/finder" >Finder</a></div>
+      <div className="linkWrap" ><a className="link" id="logout"  href="/finder" >Finder</a></div>
       <div className="linkWrap" ><a className="link" id="logout" href="/playlist" >Playlist</a></div>
-  
+      <div className="linkWrap" ><a className="link" id="logout" className="hardlink" onClick={this.back} href="javascript:void(0)" >Search</a></div>
   </nav>
   <h2 id="name">TITLE</h2>
   <p id="p">Hit the "Save Recipe" button to store a recipe in your list</p>
@@ -454,6 +475,8 @@ class Recipe extends React.Component{
   }
 }
 
+
+
 class Playlist extends React.Component{
   constructor(props){
     super(props);
@@ -476,27 +499,7 @@ class Playlist extends React.Component{
     sessionStorage.setItem("playlist", e.target.responseText)
   }
 
-  saveRecipe = (e) => {
-    console.log("saveRecipe");
-   // console.log(e);
-    let params = (new URL(document.location)).searchParams;
-    let food = params.get("food")|| sessionStorage.getItem("food")
-    console.log(food)
-    let tag = params.get("tag") || sessionStorage.getItem("tag")
-    let id = params.get("id");
-    let name = document.body.querySelector('#name').textContent
-    name = name.replace('&', "and")
-    let thumbnail = document.body.querySelector('#recipeImg').src
-    ////console.log(thumbnail)
-    let urlPath = `/recipe-playlist?food=${food}&tag=${tag}&id=${id}&name=${name}&thumbnail=${thumbnail}`
-    console.log(urlPath);
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", urlPath);
-    //////console.log(xhr.HEADERS_RECEIVED)
-    xhr.send();
-    
-    return true;
-  };
+  
 
   getPlaylist = () => {
     // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
@@ -528,7 +531,7 @@ class Playlist extends React.Component{
       <div className="linkWrap" ><a className="link" id="logout" href="/finder" >Finder</a></div>
   
   </nav>
-  <h2 id="name">Playlist</h2>
+  <h2 id="playlist">Playlist</h2>
   <p id="p"></p>
     <div className="content">
       <div id="content" class="results">
@@ -542,6 +545,66 @@ class Playlist extends React.Component{
       </div>
     </div>);
   }
+
+  saveName = (e) => {
+    console.log("saveName");
+    let element = e.target
+    
+    let params = (new URL(document.location)).searchParams;
+    //let food = params.get("food")|| sessionStorage.getItem("food")
+    //console.log(food)
+    //let tag = params.get("tag") || sessionStorage.getItem("tag")
+    let recipe = element;
+    let id = recipe.getAttribute("recipe");
+    let parent = recipe.parentElement.parentElement;
+    //parent.querySelector("#name")
+    console.log(parent);
+    let name = parent.querySelector("#name").value
+    parent.querySelector("#foodName").textContent = name
+    //recipe.textContent = name;
+   // console.log(recipe.textContent);
+   // console.log(document.querySelector('#foodName'));
+    //name = name.replace('&', "and")
+    //let thumbnail = document.body.querySelector('#recipeImg').src
+    ////console.log(thumbnail)
+    let urlPath = `/rename?id=${id}&name=${name}`
+   // console.log(urlPath);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", urlPath);
+    //////console.log(xhr.HEADERS_RECEIVED)
+    xhr.send();
+    
+    return true;
+  };
+  
+  deleteRecipe = (e) => {
+    console.log("deleteRecipe");
+    let element = e.target
+    let params = (new URL(document.location)).searchParams;
+    //let food = params.get("food")|| sessionStorage.getItem("food")
+    //console.log(food)
+    //let tag = params.get("tag") || sessionStorage.getItem("tag")
+    //let recipe = element.getAttribute("recipe");
+    let id = element.getAttribute("recipe");
+    let parent = element.parentElement.parentElement;
+    //recipe.textContent = name;
+   // console.log(document.querySelector('#foodName'));
+    //name = name.replace('&', "and")
+    //let thumbnail = document.body.querySelector('#recipeImg').src
+    ////console.log(thumbnail)
+    let urlPath = `/delete?id=${id}`
+    //console.log(urlPath);
+    const xhr = new XMLHttpRequest();
+    xhr.open("POST", urlPath);
+    //////console.log(xhr.HEADERS_RECEIVED)
+    xhr.send();
+   // let parent = recipe.parentElement
+    document.querySelector("#content").removeChild(parent)
+    //console.log(recipe.parentElement);
+    //document.removeChild(document.querySelector('.wrap'))
+    
+    return true;
+  };
 
   displayRecipies(dataString){
     let content = document.body.querySelector('#content')
@@ -558,17 +621,61 @@ class Playlist extends React.Component{
         // console.log(recipe)
         let food = recipe.food 
         let tag = recipe.tag
-        content.innerHTML+=`<div class="wrap">
+        let test = ()=>{console.log("TEST");}
+
+       /* content.innerHTML+=`<div class="wrap">
                 <img id="recipeImg" src=${recipe?.thumbnail} alt="">
                 <h3 recipe="${recipe?.id}" id="foodName" for="name">${recipe?.name}</h3>
                 <p><b>Food:</b> ${food}</p>
                 <p><b>Tag:</b> ${tag}</p>
                 <p><b>ID:</b> ${recipe?.id}</p>
-                <input recipe="${recipe?.id}" id="name" name="name" value=""/>
-                <div id="buttonWrap"><button idx=${u} recipe="${recipe?.id}" onclick="save(this)">Save Name</button> <button onclick="deleteRecipe(this)" idx=${u} recipe="${recipe?.id}">Delete</button></div>
-              </div>`
+                <input recipe="${recipe?.id}" id="name" name="name"/>
+                <div id="buttonWrap"><button onclick="${saveName}" id="saveName">Save Name</button> <button id="delete">Delete</button></div>
+              </div>`*/
+
+        let wrap = document.createElement("div")
+        wrap.className = 'wrap'
+        wrap.id="id"
+        wrap.innerHTML = `
+        <img id="recipeImg" src=${recipe?.thumbnail} alt="">
+        <h3 recipe="${recipe?.id}" id="foodName" for="name">${recipe?.name}</h3>
+        <p><b>Food:</b> ${food}</p>
+        <p><b>Tag:</b> ${tag}</p>
+        <p><b>ID:</b> ${recipe?.id}</p>`
+        let nameInput = document.createElement("input")
+        nameInput.id = `name`
+        nameInput.name = "name"
+        nameInput.setAttribute("recipe",recipe?.id)
+        let buttonWrap = document.createElement("div")
+        buttonWrap.id="buttonWrap"
+        buttonWrap.setAttribute("recipe",recipe?.id)
+        
+        let s = document.createElement("button")
+        s.id="saveName"
+        s.textContent="Save Name"
+        s.setAttribute("idx",u)
+        s.setAttribute("recipe",recipe?.id)
+        s.addEventListener('click', this.saveName)
+        let d = document.createElement("button")
+        d.id="delete"
+        d.textContent="Delete"
+        d.setAttribute("idx",u)
+        d.setAttribute("recipe",recipe?.id)
+        d.addEventListener('click', this.deleteRecipe)
+        buttonWrap.append(s)
+        buttonWrap.append(d)
+        wrap.appendChild(nameInput)
+        wrap.appendChild(buttonWrap)
+        content.appendChild(wrap)
+        //document.querySelector("#buttonWrap")
+        //<div id="buttonWrap"><button id="saveName">Save Name</button> <button id="delete">Delete</button></div>
+        
+              
       }
       
+      //document
+      //document.querySelector('#saveName').addEventListener('click', this.saveName)
+      //document.querySelector('#delete').addEventListener('click', this.deleteRecipe)
       u++;
     });
     

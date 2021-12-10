@@ -3,7 +3,9 @@ const controllers = require('./controllers');
 const mid = require('./middleware');
 
 const router = (app) => {
+  app.head('/recipes-json', controllers.recipes.GETSearchedRecipesMeta);
   app.get('/recipes-json', controllers.recipes.GETSearchedRecipes);
+  app.head('/recipe-playlist', controllers.recipes.GETPlaylistMeta);
   app.get('/recipe-playlist', controllers.recipes.GETPlaylistJSON);
   app.get('/', mid.requiresSecure, mid.requiresLogout, (req, res) => {
     res.render('login');
@@ -39,6 +41,8 @@ const router = (app) => {
   app.post('/signup', mid.requiresSecure, mid.requiresLogout, controllers.Account.signup); // mid.requiresSecure, mid.requiresLogout,
   app.post('/recipes-json', mid.requiresLogin, controllers.recipes.POSTSearchedRecipes);
   app.post('/recipe-playlist', mid.requiresLogin, controllers.recipes.POSTRecipeToPlaylist);
+  app.post('/rename', mid.requiresLogin, controllers.recipes.POSTRenameRecipe);
+  app.post('/delete', mid.requiresLogin, controllers.recipes.POSTDeleteRecipe);
   /*
   app.get('/getToken', mid.requiresSecure, controllers.Account.getToken);
   app.get('/getDomos', mid.requiresLogin, controllers.Domo.getDomos);

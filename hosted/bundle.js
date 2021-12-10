@@ -56,25 +56,34 @@ var Finder = /*#__PURE__*/function (_React$Component) {
 
       var food = searchFood.val(); //.value || searchFood.defaultValue
 
-      var tag = recipeTagInput.val() || "american"; //.value || recipeTagInput.defaultValue
+      var tag = recipeTagInput.val(); //|| "american" //.value || recipeTagInput.defaultValue
 
       sessionStorage.setItem("food", food);
       sessionStorage.setItem("tag", tag);
       var formAction = searchform.getAttribute("action");
-      var formMethod = searchform.getAttribute("method"); //let data = `?food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
+      var formMethod = searchform.getAttribute("method");
 
-      var data = formAction + "?&food=".concat(food, "&tag=").concat(tag);
-      console.log(data);
-      sendAjax(formMethod, '/recipes-json', data, function () {
-        console.log({
-          data: data
+      if (food === '' || food === undefined || tag === '' || tag === undefined) {
+        alert("RAWR! All fields are required!");
+        return false;
+      } else {
+        var data = formAction + "?&food=".concat(food, "&tag=").concat(tag);
+        console.log(data);
+        sendAjax(formMethod, '/recipes-json', data, function () {
+          console.log({
+            data: data
+          });
+          console.log("Send to ".concat(formAction));
         });
-        console.log("Send to ".concat(formAction));
-      });
-      setTimeout(function () {
-        window.location = "/recipes?&food=".concat(food, "&tag=").concat(tag);
-      }, 2000); //window.location = `/recipes?&food=${food}&tag=${tag}`
-      //console.log("Sent");
+        setTimeout(function () {
+          var loc = "/recipes?&food=".concat(food, "&tag=").concat(tag);
+          window.location = loc;
+        }, 2000);
+      } //let data = `?food=${food}&tag=${tag}` //`/recipes-client?food=${food}&tag=${tag}`
+      //window.location = `/recipes?&food=${food}&tag=${tag}`
+
+
+      return true; //console.log("Sent");
     });
 
     console.log("Finder");
@@ -290,6 +299,7 @@ var Search = /*#__PURE__*/function (_React$Component2) {
       var food = params.get("food");
       var tag = params.get("tag");
       var recipeURL = "/recipes-json?food=".concat(food, "&tag=").concat(tag);
+      console.log(recipeURL);
       var xhr = new XMLHttpRequest();
 
       xhr.onload = function (e) {
@@ -394,6 +404,16 @@ var Recipe = /*#__PURE__*/function (_React$Component3) {
 
     _this7 = _super3.call(this, props);
 
+    _defineProperty(_assertThisInitialized(_this7), "back", function (e) {
+      var link = e.target; //document.querySelector(".hardlink")
+
+      var params = new URL(document.location).searchParams;
+      var food = params.get("food") || sessionStorage.getItem("food") || "Beef";
+      var tag = params.get("tag") || sessionStorage.getItem("tag") || "american";
+      link.href = "recipes?&food=".concat(food, "&tag=").concat(tag);
+      console.log(link);
+    });
+
     _defineProperty(_assertThisInitialized(_this7), "instructions", function (instructObj) {
       var orderedList = document.createElement("ol");
       orderedList.id = "instructions";
@@ -404,7 +424,8 @@ var Recipe = /*#__PURE__*/function (_React$Component3) {
     });
 
     _defineProperty(_assertThisInitialized(_this7), "saveRecipe", function (e) {
-      console.log("saveRecipe"); // console.log(e);
+      console.log("saveRecipe");
+      e.target.disabled = true; // console.log(e);
 
       var params = new URL(document.location).searchParams;
       var food = params.get("food") || sessionStorage.getItem("food");
@@ -496,6 +517,8 @@ var Recipe = /*#__PURE__*/function (_React$Component3) {
   }, {
     key: "render",
     value: function render() {
+      var _React$createElement;
+
       return /*#__PURE__*/React.createElement("div", {
         className: "content-wrap"
       }, /*#__PURE__*/React.createElement("h1", {
@@ -520,7 +543,12 @@ var Recipe = /*#__PURE__*/function (_React$Component3) {
         className: "link",
         id: "logout",
         href: "/playlist"
-      }, "Playlist"))), /*#__PURE__*/React.createElement("h2", {
+      }, "Playlist")), /*#__PURE__*/React.createElement("div", {
+        className: "linkWrap"
+      }, /*#__PURE__*/React.createElement("a", (_React$createElement = {
+        className: "link",
+        id: "logout"
+      }, _defineProperty(_React$createElement, "className", "hardlink"), _defineProperty(_React$createElement, "onClick", this.back), _defineProperty(_React$createElement, "href", "javascript:void(0)"), _React$createElement), "Search"))), /*#__PURE__*/React.createElement("h2", {
         id: "name"
       }, "TITLE"), /*#__PURE__*/React.createElement("p", {
         id: "p"
@@ -592,27 +620,6 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
       sessionStorage.setItem("playlist", e.target.responseText);
     });
 
-    _defineProperty(_assertThisInitialized(_this8), "saveRecipe", function (e) {
-      console.log("saveRecipe"); // console.log(e);
-
-      var params = new URL(document.location).searchParams;
-      var food = params.get("food") || sessionStorage.getItem("food");
-      console.log(food);
-      var tag = params.get("tag") || sessionStorage.getItem("tag");
-      var id = params.get("id");
-      var name = document.body.querySelector('#name').textContent;
-      name = name.replace('&', "and");
-      var thumbnail = document.body.querySelector('#recipeImg').src; ////console.log(thumbnail)
-
-      var urlPath = "/recipe-playlist?food=".concat(food, "&tag=").concat(tag, "&id=").concat(id, "&name=").concat(name, "&thumbnail=").concat(thumbnail);
-      console.log(urlPath);
-      var xhr = new XMLHttpRequest();
-      xhr.open("POST", urlPath); //////console.log(xhr.HEADERS_RECEIVED)
-
-      xhr.send();
-      return true;
-    });
-
     _defineProperty(_assertThisInitialized(_this8), "getPlaylist", function () {
       // remember that an `Event` object gets passed along every time that an event handler or listener calls a function
       // the `target` property of that event points at the element that sent the event, in this case a button
@@ -627,6 +634,63 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
       xhr.open("GET", recipeURL);
       xhr.setRequestHeader('Accept', "application/javascript");
       xhr.send();
+    });
+
+    _defineProperty(_assertThisInitialized(_this8), "saveName", function (e) {
+      console.log("saveName");
+      var element = e.target;
+      var params = new URL(document.location).searchParams; //let food = params.get("food")|| sessionStorage.getItem("food")
+      //console.log(food)
+      //let tag = params.get("tag") || sessionStorage.getItem("tag")
+
+      var recipe = element;
+      var id = recipe.getAttribute("recipe");
+      var parent = recipe.parentElement.parentElement; //parent.querySelector("#name")
+
+      console.log(parent);
+      var name = parent.querySelector("#name").value;
+      parent.querySelector("#foodName").textContent = name; //recipe.textContent = name;
+      // console.log(recipe.textContent);
+      // console.log(document.querySelector('#foodName'));
+      //name = name.replace('&', "and")
+      //let thumbnail = document.body.querySelector('#recipeImg').src
+      ////console.log(thumbnail)
+
+      var urlPath = "/rename?id=".concat(id, "&name=").concat(name); // console.log(urlPath);
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", urlPath); //////console.log(xhr.HEADERS_RECEIVED)
+
+      xhr.send();
+      return true;
+    });
+
+    _defineProperty(_assertThisInitialized(_this8), "deleteRecipe", function (e) {
+      console.log("deleteRecipe");
+      var element = e.target;
+      var params = new URL(document.location).searchParams; //let food = params.get("food")|| sessionStorage.getItem("food")
+      //console.log(food)
+      //let tag = params.get("tag") || sessionStorage.getItem("tag")
+      //let recipe = element.getAttribute("recipe");
+
+      var id = element.getAttribute("recipe");
+      var parent = element.parentElement.parentElement; //recipe.textContent = name;
+      // console.log(document.querySelector('#foodName'));
+      //name = name.replace('&', "and")
+      //let thumbnail = document.body.querySelector('#recipeImg').src
+      ////console.log(thumbnail)
+
+      var urlPath = "/delete?id=".concat(id); //console.log(urlPath);
+
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", urlPath); //////console.log(xhr.HEADERS_RECEIVED)
+
+      xhr.send(); // let parent = recipe.parentElement
+
+      document.querySelector("#content").removeChild(parent); //console.log(recipe.parentElement);
+      //document.removeChild(document.querySelector('.wrap'))
+
+      return true;
     });
 
     console.log("Recipe");
@@ -669,7 +733,7 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
         id: "logout",
         href: "/finder"
       }, "Finder"))), /*#__PURE__*/React.createElement("h2", {
-        id: "name"
+        id: "playlist"
       }, "Playlist"), /*#__PURE__*/React.createElement("p", {
         id: "p"
       }), /*#__PURE__*/React.createElement("div", {
@@ -682,6 +746,8 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
   }, {
     key: "displayRecipies",
     value: function displayRecipies(dataString) {
+      var _this10 = this;
+
       var content = document.body.querySelector('#content');
       var data = dataString.playlist; ////console.log(dataString.results);
 
@@ -694,8 +760,54 @@ var Playlist = /*#__PURE__*/function (_React$Component4) {
           // console.log(recipe)
           var food = recipe.food;
           var tag = recipe.tag;
-          content.innerHTML += "<div class=\"wrap\">\n                <img id=\"recipeImg\" src=".concat(recipe === null || recipe === void 0 ? void 0 : recipe.thumbnail, " alt=\"\">\n                <h3 recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" id=\"foodName\" for=\"name\">").concat(recipe === null || recipe === void 0 ? void 0 : recipe.name, "</h3>\n                <p><b>Food:</b> ").concat(food, "</p>\n                <p><b>Tag:</b> ").concat(tag, "</p>\n                <p><b>ID:</b> ").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "</p>\n                <input recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" id=\"name\" name=\"name\" value=\"\"/>\n                <div id=\"buttonWrap\"><button idx=").concat(u, " recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" onclick=\"save(this)\">Save Name</button> <button onclick=\"deleteRecipe(this)\" idx=").concat(u, " recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\">Delete</button></div>\n              </div>");
-        }
+
+          var test = function test() {
+            console.log("TEST");
+          };
+          /* content.innerHTML+=`<div class="wrap">
+                   <img id="recipeImg" src=${recipe?.thumbnail} alt="">
+                   <h3 recipe="${recipe?.id}" id="foodName" for="name">${recipe?.name}</h3>
+                   <p><b>Food:</b> ${food}</p>
+                   <p><b>Tag:</b> ${tag}</p>
+                   <p><b>ID:</b> ${recipe?.id}</p>
+                   <input recipe="${recipe?.id}" id="name" name="name"/>
+                   <div id="buttonWrap"><button onclick="${saveName}" id="saveName">Save Name</button> <button id="delete">Delete</button></div>
+                 </div>`*/
+
+
+          var wrap = document.createElement("div");
+          wrap.className = 'wrap';
+          wrap.id = "id";
+          wrap.innerHTML = "\n        <img id=\"recipeImg\" src=".concat(recipe === null || recipe === void 0 ? void 0 : recipe.thumbnail, " alt=\"\">\n        <h3 recipe=\"").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "\" id=\"foodName\" for=\"name\">").concat(recipe === null || recipe === void 0 ? void 0 : recipe.name, "</h3>\n        <p><b>Food:</b> ").concat(food, "</p>\n        <p><b>Tag:</b> ").concat(tag, "</p>\n        <p><b>ID:</b> ").concat(recipe === null || recipe === void 0 ? void 0 : recipe.id, "</p>");
+          var nameInput = document.createElement("input");
+          nameInput.id = "name";
+          nameInput.name = "name";
+          nameInput.setAttribute("recipe", recipe === null || recipe === void 0 ? void 0 : recipe.id);
+          var buttonWrap = document.createElement("div");
+          buttonWrap.id = "buttonWrap";
+          buttonWrap.setAttribute("recipe", recipe === null || recipe === void 0 ? void 0 : recipe.id);
+          var s = document.createElement("button");
+          s.id = "saveName";
+          s.textContent = "Save Name";
+          s.setAttribute("idx", u);
+          s.setAttribute("recipe", recipe === null || recipe === void 0 ? void 0 : recipe.id);
+          s.addEventListener('click', _this10.saveName);
+          var d = document.createElement("button");
+          d.id = "delete";
+          d.textContent = "Delete";
+          d.setAttribute("idx", u);
+          d.setAttribute("recipe", recipe === null || recipe === void 0 ? void 0 : recipe.id);
+          d.addEventListener('click', _this10.deleteRecipe);
+          buttonWrap.append(s);
+          buttonWrap.append(d);
+          wrap.appendChild(nameInput);
+          wrap.appendChild(buttonWrap);
+          content.appendChild(wrap); //document.querySelector("#buttonWrap")
+          //<div id="buttonWrap"><button id="saveName">Save Name</button> <button id="delete">Delete</button></div>
+        } //document
+        //document.querySelector('#saveName').addEventListener('click', this.saveName)
+        //document.querySelector('#delete').addEventListener('click', this.deleteRecipe)
+
 
         u++;
       }); //sessionStorage.setItem("results", "")

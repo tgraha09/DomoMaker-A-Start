@@ -4,7 +4,7 @@ const http = require('https');
 // const query = require('querystring');
 const models = require('../models');
 const {
-  authenticate, findByOwner, // findByID, deleteRecipe,
+  authenticate, findByOwner, findByID, deleteRecipe,
 } = require('../models/Playlist');
 
 const { Playlist } = models;
@@ -13,39 +13,6 @@ const { defaultSearch } = require('./defaults');
 const userSearchParameters = [];
 // const userRecipes = [];
 // const searchIdx = -1;
-
-const GETSearchedRecipes = (req, res) => {
-  console.log('GETSearchedRecipes');
-
-  const { query } = req;
-  const food = `${query.food}`;
-  const tag = `${query.tag}`;
-  if (!food || !tag) { // just need to check search fields
-    return res.status(400).json({ error: 'RAWR! All fields are required' });
-  }
-  console.log(query);
-  if (userSearchParameters.length === 0) {
-    userSearchParameters.push(defaultSearch);
-  }
-  // console.log(userSearchParameters);
-  let result;
-  for (let i = 0; i < userSearchParameters.length; i += 1) {
-    const recipeObj = userSearchParameters[i];
-    if (recipeObj.food === food && recipeObj.tag === tag) {
-      result = recipeObj;
-    }
-  }
-
-  if (result === undefined || result === '') {
-    console.log('NULL');
-    // console.log(recipe)
-    return res.status(200).json({ userSearchParameters });
-  }
-  return res.status(200).json({ result });
-  // console.log(userSearchParameters);
-  // res.status(400).json({ error: 'RAWR! No Resources found' });
-  // return res.json({ redirect: '/recipes' });
-};
 
 const POSTSearchedRecipes = (req, res) => {
   console.log('POSTSearchedRecipes');
@@ -122,7 +89,7 @@ const POSTSearchedRecipes = (req, res) => {
   });
 
   tasty.end();
-  return res.json({ userSearchParameters });
+  return res.status(201).json({ userSearchParameters });
   // res.redirect('/recipes')
 };
 let activeOwner = '61a84caa7017659683108bd8';
@@ -141,9 +108,7 @@ const POSTRecipeToPlaylist = (req, res) => {
   if (!food || !tag || !id || !thumbnail || !name) { // just need to check search fields
     return res.status(400).json({ error: 'RAWR! All fields are required' });
   }
-  /* deleteRecipe(id, (err)=>{
-    console.log(err);
-  }) */
+  /*  */
   // Playlist.PlaylistModel
   return authenticate(id, (doc) => {
     // console.log(req.session.account);
@@ -162,13 +127,14 @@ const POSTRecipeToPlaylist = (req, res) => {
     let newRecipe;
     let savePromise;
     if (doc === undefined) {
-      console.log('NEW RECIPE');
       newRecipe = new Playlist.PlaylistModel(accountData);
       savePromise = newRecipe.save();
       savePromise.then(() => {
         req.session.recipe = Playlist.PlaylistModel.toAPI(newRecipe);
         // console.log("RECIPE THEN");
         console.log(req.session.recipe);
+        console.log('NEW RECIPE');
+        res.status(201).json({ message: 'Posted' });
         // return res.status(200).json({ redirect: '/finder' });
       });
 
@@ -182,29 +148,81 @@ const POSTRecipeToPlaylist = (req, res) => {
         // return res.status(200).json({ error: 'An error occured' });
       });
     } else {
-      console.log('DELETE');
-      console.log('doc');
-      // console.log(doc);
-      /* findByID(doc.id, (err, data)=>{
-        if (err) {
-          console.log(err);
-          return res.status(400).json({ error: 'An error occurred' });
-        }
-        console.log("FOUND");
-        console.log(data);
-
-      }) */
-      // console.log(r);
-      // return res.status(200).json({ message: 'Posted' });
       return res.status(400).json({ error: 'Recipe ID already present.' });
     }
 
     // savePromise = newRecipe.save();
 
-    return res.status(200).json({ message: 'Posted' });
+    return true;
   });
 };
-// let def = '61971896bbb2909349ca3c26'
+
+const respondMeta = (req, res, status, content, type) => {
+  const getBinarySize = (string) => Buffer.byteLength(string, 'utf8');
+  const headers = {
+    'Content-Type': type,
+    'Content-Length': getBinarySize(JSON.stringify(content)),
+    ...req.headers,
+  };
+  // no content to send, just headers!
+  res.writeHead(status, headers);
+  res.end();
+};
+
+const GETSearchedRecipesMeta = (req, res) => {
+  console.log('GETSearchedRecipesMeta');
+
+  const { query } = req;
+  const food = `${query.food}`;
+  const tag = `${query.tag}`;
+  if (!food || !tag) { // just need to check search fields
+    respondMeta(req, res, 404, { error: 'RAWR! All fields are required' }, 'application/json');
+    // return res.status(400).json({ error: 'RAWR! All fields are required' });
+  }
+  console.log(query);
+  if (userSearchParameters.length === 0) {
+    userSearchParameters.push(defaultSearch);
+  }
+  // console.log(userSearchParameters);
+  let result;
+  for (let i = 0; i < userSearchParameters.length; i += 1) {
+    const recipeObj = userSearchParameters[i];
+    if (recipeObj.food === food && recipeObj.tag === tag) {
+      result = recipeObj;
+    }
+  }
+
+  if (result === undefined || result === '') {
+    // console.log('NULL');
+    // console.log(recipe)
+    respondMeta(req, res, 404,
+      { error: "An error occurred, server can't find resource at the requested endpoint" }, 'application/json');
+  }
+  respondMeta(req, res, 200, result, 'application/json');
+  // return res.status(200).json({ result });
+  // console.log(userSearchParameters);
+  // res.status(400).json({ error: 'RAWR! No Resources found' });
+  // return res.json({ redirect: '/recipes' });
+};
+const GETPlaylistMeta = (req, res) => {
+  console.log(req.session);
+  findByOwner(activeOwner, (err, data) => {
+    if (err) {
+      console.log(err);
+      respondMeta(req, res, 400, { error: 'An error occurred' }, 'application/json');
+      // return res.status(400).json({ error: 'An error occurred' });
+    }
+
+    // console.log('Callback');
+    // console.log(data);
+    // return data
+    respondMeta(req, res, 200, { playlist: data }, 'application/json');
+    // res.status(200).json({ playlist: data });
+    // return data;
+  });
+  // respondMeta(req, res, 200,{ playlist: data },'application/json')
+  // return res.status(200); // res.json({ data: req.session });
+};
 const GETPlaylistJSON = (req, res) => {
   // console.log(req.session);
   findByOwner(activeOwner, (err, data) => {
@@ -222,10 +240,107 @@ const GETPlaylistJSON = (req, res) => {
 
   return res.status(200); // res.json({ data: req.session });
 };
+const GETSearchedRecipes = (req, res) => {
+  console.log('GETSearchedRecipes');
+
+  const { query } = req;
+  const food = `${query.food}`;
+  const tag = `${query.tag}`;
+  if (!food || !tag) { // just need to check search fields
+    return res.status(400).json({ error: 'RAWR! All fields are required' });
+  }
+  console.log(query);
+  if (userSearchParameters.length === 0) {
+    userSearchParameters.push(defaultSearch);
+  }
+  // console.log(userSearchParameters);
+  let result;
+  for (let i = 0; i < userSearchParameters.length; i += 1) {
+    const recipeObj = userSearchParameters[i];
+    if (recipeObj.food === food && recipeObj.tag === tag) {
+      result = recipeObj;
+    }
+  }
+
+  if (result === undefined || result === '') {
+    // console.log('NULL');
+    // console.log(recipe)
+    return res.status(404).json({ error: "An error occurred, server can't find resource at the requested endpoint" });
+  }
+
+  return res.status(200).json({ result });
+  // console.log(userSearchParameters);
+  // res.status(400).json({ error: 'RAWR! No Resources found' });
+  // return res.json({ redirect: '/recipes' });
+};
+// let def = '61971896bbb2909349ca3c26'
+
+const POSTRenameRecipe = (req, res) => {
+  console.log('POSTRenameRecipe');
+  const { query } = req; // url.parse(req.Search, true); //querystring.parse(req.query)
+  // console.log(query);
+  const id = parseInt(`${query.id}`, 10);
+  const name = `${query.name}`;
+  // console.log(thumbnail);
+  if (!id || !name) { // just need to check search fields
+    return res.status(400).json({ error: 'RAWR! All fields are required' });
+  }
+  findByID(id, (err, data) => {
+    if (err) {
+      console.log(err);
+      return res.status(404).json({ error: "An error occurred, server can't find resource at the requested endpoint" });
+    }
+
+    console.log('Callback');
+    console.log(data);
+    data.name = name;
+    data.save((error) => {
+      if (error) {
+        console.log({ error });
+      } else {
+        console.log('saved');
+        console.log(data);
+      }
+      // res.json('Success');
+    });
+    // return data
+    // res.status(200).json({ playlist: data });
+    return data;
+  });
+
+  return res.status(204); // res.json({ data: req.session });
+};
+
+const POSTDeleteRecipe = (req, res) => {
+  console.log('POSTDeleteRecipe');
+  const { query } = req; // url.parse(req.Search, true); //querystring.parse(req.query)
+  // console.log(query);
+  const id = parseInt(`${query.id}`, 10);
+
+  // console.log(thumbnail);
+  if (!id) { // just need to check search fields
+    return res.status(400).json({ error: 'RAWR! All fields are required' });
+  }
+
+  deleteRecipe(id, (err) => {
+    if (err) {
+      console.log(err);
+      return res.status(404).json({ error: 'An error occurred' });
+    }
+    console.log(err);
+    return res.status(204);
+  });
+
+  return res.status(204); // res.json({ data: req.session });
+};
 
 module.exports = {
   POSTSearchedRecipes,
   GETSearchedRecipes,
   POSTRecipeToPlaylist,
   GETPlaylistJSON,
+  POSTRenameRecipe,
+  POSTDeleteRecipe,
+  GETPlaylistMeta,
+  GETSearchedRecipesMeta,
 };

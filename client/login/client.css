@@ -90,6 +90,7 @@
 
 #foodName{
   color: white;
+  
 }
 
 #content{
@@ -102,6 +103,8 @@
   overflow-y: scroll;
   color: white;
 }
+
+
 #content::-webkit-scrollbar {
   display: none;
 }

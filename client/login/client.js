@@ -1,6 +1,6 @@
 
 
-  class LoginWindowJSX extends React.Component{
+  class LoginWindow extends React.Component{
     constructor(props){
       super(props);
       console.log("LoginWindow");
@@ -130,12 +130,12 @@ const Display = ({ ...props }) => {
       //$("#domoMessage").animate({width:'hide'},350);
       
       if(!this.checkFields()){
-        handleError("RAWR! All fields are required!");
+        alert("RAWR! All fields are required!");
         return false;
       }
   
       if(!this.checkPasswords()){
-        handleError("RAWR! Passwords do not match!");
+        alert("RAWR! Passwords do not match!");
         return false;
       }
       
@@ -201,7 +201,7 @@ const Display = ({ ...props }) => {
       }
       else{
         ReactDOM.render(<Display>
-            <LoginWindowJSX />
+            <LoginWindow />
         </Display>,
           document.getElementById("root")// querySelector("#nav")
         ); 

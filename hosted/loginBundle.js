@@ -26,15 +26,15 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
-  _inherits(LoginWindowJSX, _React$Component);
+var LoginWindow = /*#__PURE__*/function (_React$Component) {
+  _inherits(LoginWindow, _React$Component);
 
-  var _super = _createSuper(LoginWindowJSX);
+  var _super = _createSuper(LoginWindow);
 
-  function LoginWindowJSX(props) {
+  function LoginWindow(props) {
     var _this;
 
-    _classCallCheck(this, LoginWindowJSX);
+    _classCallCheck(this, LoginWindow);
 
     _this = _super.call(this, props);
     console.log("LoginWindow");
@@ -47,7 +47,7 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
     return _this;
   }
 
-  _createClass(LoginWindowJSX, [{
+  _createClass(LoginWindow, [{
     key: "handleChange",
     value: function handleChange(e) {
       this.setState(_defineProperty({}, e.target.name, e.target.value));
@@ -147,7 +147,7 @@ var LoginWindowJSX = /*#__PURE__*/function (_React$Component) {
     }
   }]);
 
-  return LoginWindowJSX;
+  return LoginWindow;
 }(React.Component);
 
 var Display = function Display(_ref) {
@@ -212,12 +212,12 @@ var SignupWindow = /*#__PURE__*/function (_React$Component2) {
       e.preventDefault(); //$("#domoMessage").animate({width:'hide'},350);
 
       if (!this.checkFields()) {
-        handleError("RAWR! All fields are required!");
+        alert("RAWR! All fields are required!");
         return false;
       }
 
       if (!this.checkPasswords()) {
-        handleError("RAWR! Passwords do not match!");
+        alert("RAWR! Passwords do not match!");
         return false;
       }
 
@@ -311,7 +311,7 @@ var createWindow = function createWindow(csrf) {
     ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(SignupWindow, null)), document.getElementById("root") // querySelector("#nav")
     );
   } else {
-    ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(LoginWindowJSX, null)), document.getElementById("root") // querySelector("#nav")
+    ReactDOM.render( /*#__PURE__*/React.createElement(Display, null, /*#__PURE__*/React.createElement(LoginWindow, null)), document.getElementById("root") // querySelector("#nav")
     );
   } //React.createElement(LoginWindowJSX)
 
