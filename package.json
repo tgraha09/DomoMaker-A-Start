@@ -1,5 +1,5 @@
 {
-  "name": "Logins",
+  "name": "Recipe Finder",
   "version": "1.0.0",
   "engines": {
     "node": "12.16.0",
@@ -25,7 +25,7 @@
     "Redis",
     "Login"
   ],
-  "author": "Cody Van De Mark",
+  "author": "Taurian Graham",
   "license": "Apache 2.0",
   "devDependencies": {
     "@babel/cli": "^7.15.7",

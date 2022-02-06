@@ -68,23 +68,6 @@ const POSTSearchedRecipes = (req, res) => {
         results,
       });
 
-      /* let recipe;
-      for (let i = 0; i < userSearchParameters.length; i += 1) {
-        const recipeObj = userSearchParameters[i];
-        if (recipeObj.food === food && recipeObj.tag === tag) {
-          recipe = recipeObj;
-        }
-      } */
-
-      // console.log(userSearchParameters);
-      // console.log(recipe)
-      /* if (acceptedTypes.includes('text/xml')) {
-        //const content = buildXML(recipe);
-        //respond(request, response, 201, content, 'text/xml');
-      } else {
-        // //console.log(recipe)
-        //respond(request, response, 201, JSON.stringify(recipe), 'application/json');
-      } */
     });
   });
 
